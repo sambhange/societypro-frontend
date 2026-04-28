@@ -1,11 +1,11 @@
 'use client';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle, Eye, EyeOff, Building2, Users, MapPin, Mail, Lock, Phone, ArrowRight } from 'lucide-react';
 
 const STEPS = ['Society Details', 'Admin Setup', 'Choose Plan', 'Confirm'];
 
-export default function Register() {
+function RegisterContent() {
   const router       = useRouter();
   const searchParams = useSearchParams();
   const defaultPlan  = searchParams.get('plan') || 'standard';
@@ -248,5 +248,13 @@ export default function Register() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Register() {
+  return (
+    <Suspense fallback={<div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center' }}>Loading...</div>}>
+      <RegisterContent />
+    </Suspense>
   );
 }
