@@ -1,4 +1,5 @@
 'use client';
+import '../styles/globals.css';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
