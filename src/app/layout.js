@@ -1,149 +1,193 @@
 'use client';
-import '../styles/globals.css';
+import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Users, Wrench, Megaphone,
-  CalendarDays, ImageIcon, CreditCard, Settings, Bell,
-  Building2, ConciergeBell, Ticket, ParkingSquare, ShieldCheck, UserCog, BarChart3, MessagesSquare, FolderOpen, CalendarCheck, BellRing
+  CalendarCheck, Image, CreditCard, MessageSquare,
+  ParkingSquare, ShieldCheck, UserCog, BarChart3,
+  MessagesSquare, FolderOpen, Building2, ConciergeBell,
+  Ticket, BellRing, LogOut, Settings, ChevronDown
 } from 'lucide-react';
-import { SOCIETY } from '../lib/data';
+import { useState } from 'react';
 
 const NAV = [
-  { href: '/dashboard',     label: 'Dashboard',      icon: LayoutDashboard, group: 'main' },
-  { href: '/tenants',       label: 'Tenants',         icon: Users,           group: 'main' },
-  { href: '/maintenance',   label: 'Maintenance',     icon: Wrench,          group: 'main' },
-  { href: '/announcements', label: 'Announcements',   icon: Megaphone,       group: 'main' },
-  { href: '/meetings',      label: 'Meetings',        icon: CalendarDays,    group: 'main' },
-  { href: '/gallery',       label: 'Gallery',         icon: ImageIcon,       group: 'main' },
-  { href: '/payments',      label: 'Payments',        icon: CreditCard,      group: 'main' },
-  { href: '/complaints',    label: 'Complaint Box',   icon: Ticket,          group: 'main' },
-  { href: '/parking',       label: 'Parking',         icon: ParkingSquare,   group: 'main' },
-  { href: '/visitors',      label: 'Visitor Log',     icon: ShieldCheck,     group: 'main' },
-  { href: '/committee',     label: 'Committee',       icon: UserCog,         group: 'main' },
-  { href: '/polls',         label: 'Polls & Voting',  icon: BarChart3,       group: 'main' },
-  { href: '/forum',         label: 'Discussion Forum',icon: MessagesSquare,  group: 'main' },
-  { href: '/files',         label: 'File Repository', icon: FolderOpen,      group: 'main' },
-  { href: '/facilities',    label: 'Facility Booking',icon: CalendarCheck,   group: 'main' },
-  { href: '/notifications', label: 'SMS Alerts',      icon: BellRing,        group: 'main' },
-  { href: '/properties',    label: 'Properties',      icon: Building2,       group: 'marketplace' },
-  { href: '/services',      label: 'Home Services',   icon: ConciergeBell,   group: 'marketplace' },
+  { href: '/dashboard',     label: 'Dashboard',        icon: LayoutDashboard, group: 'main' },
+  { href: '/tenants',       label: 'Tenants',           icon: Users,           group: 'main' },
+  { href: '/maintenance',   label: 'Maintenance',       icon: Wrench,          group: 'main' },
+  { href: '/payments',      label: 'Payments',          icon: CreditCard,      group: 'main' },
+  { href: '/announcements', label: 'Announcements',     icon: Megaphone,       group: 'main' },
+  { href: '/meetings',      label: 'Meetings',          icon: CalendarCheck,   group: 'main' },
+  { href: '/gallery',       label: 'Gallery',           icon: Image,           group: 'main' },
+  { href: '/complaints',    label: 'Complaint Box',     icon: Ticket,          group: 'main' },
+  { href: '/parking',       label: 'Parking',           icon: ParkingSquare,   group: 'main' },
+  { href: '/visitors',      label: 'Visitor Log',       icon: ShieldCheck,     group: 'main' },
+  { href: '/committee',     label: 'Committee',         icon: UserCog,         group: 'main' },
+  { href: '/polls',         label: 'Polls & Voting',    icon: BarChart3,       group: 'main' },
+  { href: '/forum',         label: 'Discussion Forum',  icon: MessagesSquare,  group: 'main' },
+  { href: '/files',         label: 'File Repository',   icon: FolderOpen,      group: 'main' },
+  { href: '/facilities',    label: 'Facility Booking',  icon: Building2,       group: 'main' },
+  { href: '/notifications', label: 'SMS Alerts',        icon: BellRing,        group: 'main' },
+  { href: '/properties',    label: 'Properties',        icon: Building2,       group: 'marketplace' },
+  { href: '/services',      label: 'Home Services',     icon: ConciergeBell,   group: 'marketplace' },
 ];
 
-function Sidebar({ pathname }) {
-  const isLogin = pathname === '/' || pathname === '/login';
-  if (isLogin) return null;
-
-  return (
-    <aside className="sidebar">
-      <div className="logo">
-        <div className="logo-name">🏢 {SOCIETY.name}</div>
-        <div className="logo-sub">Society Management</div>
-      </div>
-
-      <nav className="nav-group">
-        <div className="nav-label">Society</div>
-        {NAV.filter(n => n.group === 'main').map(({ href, label, icon: Icon }) => (
-          <Link key={href} href={href}>
-            <div className={`nav-item ${pathname === href ? 'active' : ''}`}>
-              <Icon size={17} />
-              {label}
-            </div>
-          </Link>
-        ))}
-        <div className="nav-label" style={{ marginTop: 8 }}>Marketplace</div>
-        {NAV.filter(n => n.group === 'marketplace').map(({ href, label, icon: Icon }) => (
-          <Link key={href} href={href}>
-            <div className={`nav-item ${pathname === href ? 'active' : ''}`}>
-              <Icon size={17} />
-              {label}
-            </div>
-          </Link>
-        ))}
-      </nav>
-
-      <div style={{ padding: '0 10px', marginBottom: 8 }}>
-        <Link href="/settings">
-          <div className={`nav-item ${pathname === '/settings' ? 'active' : ''}`}>
-            <Settings size={17} />
-            Settings
-          </div>
-        </Link>
-      </div>
-
-      <div className="sidebar-footer">
-        <div className="sidebar-user">{SOCIETY.secretary}</div>
-        <div className="sidebar-role">Society Secretary</div>
-      </div>
-    </aside>
-  );
-}
-
-function TopBar({ pathname }) {
-  const isLogin = pathname === '/' || pathname === '/login';
-  if (isLogin) return null;
-
-  const labels = {
-    '/dashboard':     { title: 'Dashboard',      sub: `Overview · ${SOCIETY.name}` },
-    '/tenants':       { title: 'Tenants',         sub: 'Manage all flat owners and tenants' },
-    '/maintenance':   { title: 'Maintenance',     sub: 'Monthly maintenance payment records' },
-    '/announcements': { title: 'Announcements',   sub: 'Post and manage society notices' },
-    '/meetings':      { title: 'Meetings',        sub: 'Schedule and track society meetings' },
-    '/gallery':       { title: 'Photo Gallery',   sub: 'Society events and function photos' },
-    '/payments':      { title: 'Payments',        sub: 'UPI & payment collection history' },
-    '/complaints':    { title: 'Complaint Box',   sub: 'Raise and manage resident complaints' },
-    '/notifications': { title: 'SMS Alerts',         sub: 'Send SMS and WhatsApp alerts to all residents' },
-    '/facilities':    { title: 'Facility Booking',   sub: 'Book community hall, gym, pool and more' },
-    '/files':         { title: 'File Repository',    sub: 'Society documents, forms, circulars and media' },
-    '/forum':         { title: 'Discussion Forum',  sub: 'Community discussions, suggestions and help' },
-    '/polls':         { title: 'Polls & Voting',    sub: 'Create polls and collect resident votes' },
-    '/committee':     { title: 'Committee Members', sub: 'Society committee — roles, contacts and tenure' },
-    '/visitors':      { title: 'Visitor Management', sub: 'Gate keeper log — track all visitors' },
-    '/parking':       { title: 'Parking Manager',  sub: 'Vehicle registration and slot management' },
-    '/properties':    { title: 'Properties',       sub: 'Flats for sale and rent in the society' },
-    '/services':      { title: 'Home Services',    sub: 'Book painting, plumbing, beauty and more' },
-  };
-  const info = labels[pathname] || { title: 'Society App', sub: '' };
-
-  return (
-    <div className="topbar">
-      <div>
-        <div className="page-title">{info.title}</div>
-        <div className="page-sub">{info.sub}</div>
-      </div>
-      <div className="topbar-actions">
-        <div style={{ position: 'relative', cursor: 'pointer', color: 'var(--muted)' }}>
-          <Bell size={20} />
-          <span style={{
-            position: 'absolute', top: -4, right: -4,
-            width: 8, height: 8, background: 'var(--red)',
-            borderRadius: '50%', display: 'block'
-          }} />
-        </div>
-        <div className="avatar">A</div>
-      </div>
-    </div>
-  );
-}
+const PAGE_INFO = {
+  '/dashboard':     { title: 'Dashboard',          sub: 'Overview of your society' },
+  '/tenants':       { title: 'Tenant Management',  sub: 'Manage all residents and flat owners' },
+  '/maintenance':   { title: 'Maintenance',         sub: 'Track and manage maintenance billing' },
+  '/payments':      { title: 'Payments',            sub: 'Payment records and Razorpay integration' },
+  '/announcements': { title: 'Announcements',       sub: 'Post notices and alerts to residents' },
+  '/meetings':      { title: 'Meetings',            sub: 'Schedule and manage society meetings' },
+  '/gallery':       { title: 'Photo Gallery',       sub: 'Society events and photo albums' },
+  '/complaints':    { title: 'Complaint Box',       sub: 'Resident complaints and ticket tracking' },
+  '/parking':       { title: 'Parking Manager',     sub: 'Slot allocation and vehicle registration' },
+  '/visitors':      { title: 'Visitor Management',  sub: 'Gate entry log and visitor tracking' },
+  '/committee':     { title: 'Committee Members',   sub: 'Society committee roles and contacts' },
+  '/polls':         { title: 'Polls & Voting',      sub: 'Create polls and collect resident votes' },
+  '/forum':         { title: 'Discussion Forum',    sub: 'Community discussions and suggestions' },
+  '/files':         { title: 'File Repository',     sub: 'Society documents, forms and circulars' },
+  '/facilities':    { title: 'Facility Booking',    sub: 'Book community hall, gym, pool and more' },
+  '/notifications': { title: 'SMS Alerts',          sub: 'Send SMS and WhatsApp alerts to residents' },
+  '/properties':    { title: 'Properties',          sub: 'Buy and rent listings in your society' },
+  '/services':      { title: 'Home Services',       sub: 'Book home services for residents' },
+  '/settings':      { title: 'Settings',            sub: 'Society profile, account and billing' },
+};
 
 export default function RootLayout({ children }) {
-  const pathname = usePathname();
-  const isLogin = pathname === '/' || pathname === '/login';
+  const pathname  = usePathname();
+  const router    = useRouter();
+  const [showLogout, setShowLogout] = useState(false);
+
+  // Don't show sidebar on login/register/pricing pages
+  const noLayout = ['/', '/login', '/register', '/pricing', '/superadmin', '/onboarding'].includes(pathname);
+  if (noLayout) return <html lang="en"><body>{children}</body></html>;
+
+  const pageInfo = PAGE_INFO[pathname] || { title: 'SocietyPro', sub: '' };
+
+  const handleLogout = () => {
+    // Clear all stored data
+    localStorage.removeItem('token');
+    localStorage.removeItem('society');
+    localStorage.removeItem('user');
+    sessionStorage.clear();
+    // Redirect to login
+    router.push('/');
+  };
 
   return (
     <html lang="en">
       <head>
-        <title>Society Management – {SOCIETY.name}</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.googleapis.com"/>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/>
+        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
       </head>
       <body>
         <div className="layout">
-          <Sidebar pathname={pathname} />
-          <main className={isLogin ? '' : 'main-content'} style={isLogin ? {} : {}}>
-            {!isLogin && <TopBar pathname={pathname} />}
+
+          {/* ── Sidebar ── */}
+          <aside className="sidebar">
+
+            {/* Logo */}
+            <div className="logo">
+              <div className="logo-name">🏢 SocietyPro</div>
+              <div className="logo-sub">Society Management</div>
+            </div>
+
+            {/* Nav items */}
+            <nav className="nav-group">
+              <div className="nav-label">Main Menu</div>
+              {NAV.filter(n => n.group === 'main').map(item => {
+                const Icon = item.icon;
+                const active = pathname === item.href;
+                return (
+                  <Link key={item.href} href={item.href}>
+                    <div className={`nav-item ${active ? 'active' : ''}`}>
+                      <Icon size={16}/>
+                      {item.label}
+                    </div>
+                  </Link>
+                );
+              })}
+
+              <div className="nav-label" style={{ marginTop: 12 }}>Marketplace</div>
+              {NAV.filter(n => n.group === 'marketplace').map(item => {
+                const Icon = item.icon;
+                const active = pathname === item.href;
+                return (
+                  <Link key={item.href} href={item.href}>
+                    <div className={`nav-item ${active ? 'active' : ''}`}>
+                      <Icon size={16}/>
+                      {item.label}
+                    </div>
+                  </Link>
+                );
+              })}
+
+              {/* Settings */}
+              <div className="nav-label" style={{ marginTop: 12 }}>Account</div>
+              <Link href="/settings">
+                <div className={`nav-item ${pathname === '/settings' ? 'active' : ''}`}>
+                  <Settings size={16}/>
+                  Settings
+                </div>
+              </Link>
+            </nav>
+
+            {/* Sidebar footer with logout */}
+            <div className="sidebar-footer">
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div className="sidebar-user">Rajesh Kumar</div>
+                  <div className="sidebar-role">Society Secretary</div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  title="Logout"
+                  style={{
+                    background: 'rgba(220,38,38,0.08)',
+                    border: '1px solid rgba(220,38,38,0.15)',
+                    borderRadius: 8,
+                    cursor: 'pointer',
+                    color: '#DC2626',
+                    padding: '7px 10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 5,
+                    fontSize: 12,
+                    fontWeight: 700,
+                    flexShrink: 0,
+                    transition: 'all 0.15s',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background='rgba(220,38,38,0.15)'}
+                  onMouseLeave={e => e.currentTarget.style.background='rgba(220,38,38,0.08)'}
+                >
+                  <LogOut size={14}/>
+                  Logout
+                </button>
+              </div>
+            </div>
+
+          </aside>
+
+          {/* ── Main content ── */}
+          <main className="main-content">
+
+            {/* Top bar */}
+            <div className="topbar">
+              <div>
+                <div className="page-title">{pageInfo.title}</div>
+                {pageInfo.sub && <div className="page-sub">{pageInfo.sub}</div>}
+              </div>
+              <div className="topbar-actions">
+                <div className="avatar" title="My Account" onClick={() => router.push('/settings')}>
+                  RK
+                </div>
+              </div>
+            </div>
+
             {children}
           </main>
+
         </div>
       </body>
     </html>
