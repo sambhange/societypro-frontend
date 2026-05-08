@@ -1,17 +1,18 @@
 'use client';
 import '../styles/globals.css';
-import { usePathname, useRouter } from 'next/navigation';
+import { IndianRupee, usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import {
+import { IndianRupee,
   LayoutDashboard, Users, Wrench, Megaphone,
   CalendarCheck, Image, CreditCard, MessageSquare,
   ParkingSquare, ShieldCheck, UserCog, BarChart3,
   MessagesSquare, FolderOpen, Building2, ConciergeBell,
   Ticket, BellRing, LogOut, Settings, ChevronDown
 } from 'lucide-react';
-import { useState } from 'react';
+import { IndianRupee, useState } from 'react';
 
 const NAV = [
+  { href: '/accounting',    label: 'Accounting',       icon: IndianRupee,     group: 'main' },
   { href: '/dashboard',     label: 'Dashboard',        icon: LayoutDashboard, group: 'main' },
   { href: '/tenants',       label: 'Tenants',           icon: Users,           group: 'main' },
   { href: '/maintenance',   label: 'Maintenance',       icon: Wrench,          group: 'main' },
@@ -33,7 +34,8 @@ const NAV = [
 ];
 
 const PAGE_INFO = {
-  '/dashboard':     { title: 'Dashboard',          sub: 'Overview of your society' },
+  '/accounting':    { title: 'Accounting',         sub: 'Income, expenses, GST invoices and balance sheet' },
+  '/dashboard':      { title: 'Dashboard',          sub: 'Overview of your society' },
   '/tenants':       { title: 'Tenant Management',  sub: 'Manage all residents and flat owners' },
   '/maintenance':   { title: 'Maintenance',         sub: 'Track and manage maintenance billing' },
   '/payments':      { title: 'Payments',            sub: 'Payment records and Razorpay integration' },
