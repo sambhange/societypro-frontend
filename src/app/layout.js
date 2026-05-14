@@ -62,7 +62,7 @@ export default function RootLayout({ children }) {
   const [showLogout, setShowLogout] = useState(false);
 
   // Don't show sidebar on login/register/pricing pages
-   const noLayout = ['/', '/login', '/register', '/pricing', '/superadmin', '/onboarding', '/resident-login', '/resident'].includes(pathname););
+   const noLayout = ['/', '/login', '/register', '/pricing', '/superadmin', '/onboarding', '/resident-login', '/resident'].includes(pathname);
   if (noLayout) return <html lang="en"><body>{children}</body></html>;
 
   const pageInfo = PAGE_INFO[pathname] || { title: 'SocietyPro', sub: '' };
