@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="SocietyPro — Simple society management software for cooperative housing societies in India. Maintenance billing, complaints, accounting and more."/>
+  <meta name="keywords" content="society management software, housing society app, CHS software, maintenance billing, India"/>
+  <title>SocietyPro — Society Management Made Simple</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --dark:#0F172A;--navy:#1E3A8A;--blue:#2563EB;--blue-light:#EFF6FF;
+      --purple:#7C3AED;--green:#16A34A;--orange:#D97706;--red:#DC2626;
+      --gray:#64748B;--light-gray:#94A3B8;--border:#E2E8F0;--bg:#F8FAFC;--white:#fff;
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--dark);line-height:1.6}
+
+    /* NAV */
+    nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(15,23,42,0.95);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,0.08)}
+    .nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo-icon{width:38px;height:38px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+    .logo-text{font-size:20px;font-weight:800;color:white}
+    .nav-links{display:flex;align-items:center;gap:32px}
+    .nav-links a{color:#CBD5E1;text-decoration:none;font-size:14px;font-weight:500;transition:color 0.2s}
+    .nav-links a:hover{color:white}
+    .nav-cta{display:flex;align-items:center;gap:12px}
+    .btn-login{padding:8px 18px;border:1.5px solid rgba(255,255,255,0.2);border-radius:8px;color:white;text-decoration:none;font-size:13px;font-weight:600;transition:all 0.2s}
+    .btn-login:hover{background:rgba(255,255,255,0.1)}
+    .btn-primary{padding:9px 20px;background:var(--blue);border-radius:8px;color:white;text-decoration:none;font-size:13px;font-weight:700;transition:all 0.2s}
+    .btn-primary:hover{background:#1D4ED8;transform:translateY(-1px)}
+
+    /* HERO */
+    .hero{min-height:100vh;background:linear-gradient(135deg,#0F172A 0%,#1E3A8A 50%,#0F172A 100%);display:flex;align-items:center;padding:100px 24px 60px;position:relative;overflow:hidden}
+    .hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
+    .hero-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+    .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(37,99,235,0.2);border:1px solid rgba(37,99,235,0.4);border-radius:99px;padding:6px 14px;font-size:12px;font-weight:700;color:#93C5FD;margin-bottom:24px}
+    .hero h1{font-size:52px;font-weight:800;color:white;line-height:1.15;margin-bottom:20px}
+    .hero h1 span{color:#60A5FA}
+    .hero p{font-size:18px;color:#94A3B8;margin-bottom:32px;line-height:1.7}
+    .hero-btns{display:flex;gap:14px;flex-wrap:wrap}
+    .hero-btn-primary{padding:14px 28px;background:var(--blue);border-radius:12px;color:white;text-decoration:none;font-size:15px;font-weight:700;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px}
+    .hero-btn-primary:hover{background:#1D4ED8;transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,99,235,0.4)}
+    .hero-btn-secondary{padding:14px 28px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);border-radius:12px;color:white;text-decoration:none;font-size:15px;font-weight:600;transition:all 0.2s}
+    .hero-btn-secondary:hover{background:rgba(255,255,255,0.12)}
+    .hero-stats{display:flex;gap:32px;margin-top:40px;flex-wrap:wrap}
+    .hero-stat{display:flex;flex-direction:column}
+    .hero-stat-val{font-size:28px;font-weight:800;color:white}
+    .hero-stat-label{font-size:12px;color:#94A3B8;margin-top:2px}
+
+    /* Dashboard mockup */
+    .hero-visual{position:relative}
+    .mockup{background:white;border-radius:16px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1)}
+    .mockup-bar{background:#0F172A;height:40px;display:flex;align-items:center;padding:0 16px;gap:8px}
+    .mockup-dot{width:12px;height:12px;border-radius:50%}
+    .mockup-title{color:#64748B;font-size:11px;margin-left:8px}
+    .mockup-body{background:#F1F5F9;padding:16px;display:grid;grid-template-columns:140px 1fr;gap:12px;min-height:340px}
+    .mockup-sidebar{background:#0F172A;border-radius:10px;padding:12px 0}
+    .mockup-logo-m{padding:8px 12px;color:white;font-weight:800;font-size:13px;margin-bottom:8px}
+    .mockup-nav-item{padding:7px 12px;font-size:11px;color:#64748B;display:flex;align-items:center;gap:6px}
+    .mockup-nav-item.active{background:rgba(37,99,235,0.15);color:#60A5FA;border-left:3px solid #2563EB}
+    .mockup-content{display:flex;flex-direction:column;gap:10px}
+    .mockup-stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+    .mockup-stat-card{background:white;border-radius:8px;padding:10px;border:1px solid #E2E8F0}
+    .mockup-stat-val{font-size:16px;font-weight:800;color:#2563EB}
+    .mockup-stat-label{font-size:9px;color:#94A3B8;margin-top:2px}
+    .mockup-chart{background:white;border-radius:8px;padding:12px;border:1px solid #E2E8F0;flex:1}
+    .mockup-chart-title{font-size:10px;font-weight:700;color:#0F172A;margin-bottom:8px}
+    .mockup-bars{display:flex;align-items:flex-end;gap:6px;height:60px}
+    .mockup-bar-item{flex:1;border-radius:4px 4px 0 0;background:linear-gradient(to top,#2563EB,#60A5FA)}
+    .mockup-table{background:white;border-radius:8px;border:1px solid #E2E8F0;overflow:hidden}
+    .mockup-table-hdr{background:#F8FAFC;padding:8px 10px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px}
+    .mockup-table-hdr span{font-size:8px;font-weight:700;color:#94A3B8;text-transform:uppercase}
+    .mockup-table-row{padding:7px 10px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;border-top:1px solid #F1F5F9}
+    .mockup-table-row span{font-size:9px;color:#64748B}
+    .badge-green{background:#D1FAE5;color:#065F46;padding:1px 6px;border-radius:99px;font-size:8px;font-weight:700;display:inline-block}
+    .badge-red{background:#FEE2E2;color:#991B1B;padding:1px 6px;border-radius:99px;font-size:8px;font-weight:700;display:inline-block}
+    .badge-orange{background:#FEF3C7;color:#92400E;padding:1px 6px;border-radius:99px;font-size:8px;font-weight:700;display:inline-block}
+
+    /* SECTIONS */
+    section{padding:80px 24px}
+    .container{max-width:1200px;margin:0 auto}
+    .section-label{font-size:12px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px}
+    .section-title{font-size:38px;font-weight:800;color:var(--dark);margin-bottom:16px;line-height:1.2}
+    .section-sub{font-size:17px;color:var(--gray);max-width:600px;line-height:1.7}
+    .text-center{text-align:center}
+    .text-center .section-sub{margin:0 auto}
+
+    /* PROBLEM */
+    .problem{background:var(--bg)}
+    .problem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
+    .problem-card{background:white;border-radius:16px;padding:28px;border:1px solid var(--border);border-left:4px solid var(--red)}
+    .problem-emoji{font-size:32px;margin-bottom:16px}
+    .problem-title{font-size:15px;font-weight:700;color:var(--dark);margin-bottom:8px}
+    .problem-desc{font-size:14px;color:var(--gray);line-height:1.6}
+
+    /* FEATURES */
+    .features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
+    .feature-card{background:white;border-radius:16px;padding:28px;border:1px solid var(--border);transition:all 0.2s}
+    .feature-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.1);border-color:var(--blue)}
+    .feature-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:16px}
+    .feature-title{font-size:16px;font-weight:700;color:var(--dark);margin-bottom:8px}
+    .feature-desc{font-size:14px;color:var(--gray);line-height:1.6}
+
+    /* HOW IT WORKS */
+    .how{background:var(--bg)}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:48px;position:relative}
+    .steps::before{content:'';position:absolute;top:32px;left:20%;right:20%;height:2px;background:linear-gradient(to right,var(--blue),var(--purple));z-index:0}
+    .step{text-align:center;position:relative;z-index:1}
+    .step-num{width:64px;height:64px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:white;margin:0 auto 20px;box-shadow:0 4px 16px rgba(37,99,235,0.3)}
+    .step-title{font-size:17px;font-weight:700;color:var(--dark);margin-bottom:8px}
+    .step-desc{font-size:14px;color:var(--gray);line-height:1.6}
+
+    /* PRICING */
+    .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
+    .pricing-card{background:white;border-radius:20px;padding:32px;border:2px solid var(--border);transition:all 0.2s;position:relative}
+    .pricing-card.popular{border-color:var(--blue);box-shadow:0 8px 32px rgba(37,99,235,0.15)}
+    .popular-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--blue);color:white;padding:4px 16px;border-radius:99px;font-size:12px;font-weight:700}
+    .pricing-plan{font-size:14px;font-weight:700;color:var(--gray);margin-bottom:8px}
+    .pricing-price{font-size:40px;font-weight:800;color:var(--dark);margin-bottom:4px}
+    .pricing-price span{font-size:15px;font-weight:400;color:var(--gray)}
+    .pricing-flats{font-size:13px;color:var(--gray);margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid var(--border)}
+    .pricing-features{list-style:none;margin-bottom:28px}
+    .pricing-features li{font-size:14px;color:var(--gray);padding:6px 0;display:flex;align-items:center;gap:8px}
+    .pricing-features li::before{content:'✓';color:var(--green);font-weight:800;flex-shrink:0}
+    .pricing-btn{display:block;text-align:center;padding:12px;border-radius:10px;font-size:14px;font-weight:700;text-decoration:none;transition:all 0.2s}
+    .pricing-btn-outline{border:2px solid var(--blue);color:var(--blue)}
+    .pricing-btn-outline:hover{background:var(--blue);color:white}
+    .pricing-btn-filled{background:var(--blue);color:white}
+    .pricing-btn-filled:hover{background:#1D4ED8}
+    .trial-note{text-align:center;font-size:14px;color:var(--gray);margin-top:20px}
+
+    /* TESTIMONIALS */
+    .testimonials{background:var(--bg)}
+    .testimonial-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
+    .testimonial-card{background:white;border-radius:16px;padding:28px;border:1px solid var(--border)}
+    .stars{color:#F59E0B;font-size:18px;margin-bottom:16px}
+    .testimonial-text{font-size:15px;color:var(--gray);line-height:1.7;margin-bottom:20px;font-style:italic}
+    .testimonial-author{display:flex;align-items:center;gap:12px}
+    .author-avatar{width:44px;height:44px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:16px;flex-shrink:0}
+    .author-name{font-size:14px;font-weight:700;color:var(--dark)}
+    .author-role{font-size:12px;color:var(--gray)}
+
+    /* COMPARE */
+    .compare-table{margin-top:40px;border-radius:16px;overflow:hidden;border:1px solid var(--border)}
+    .compare-hdr{display:grid;grid-template-columns:3fr 1fr 1fr 1fr 1fr;background:var(--dark);padding:16px 24px;gap:16px}
+    .compare-hdr span{font-size:12px;font-weight:700;color:white;text-align:center}
+    .compare-hdr span:first-child{text-align:left}
+    .compare-row{display:grid;grid-template-columns:3fr 1fr 1fr 1fr 1fr;padding:14px 24px;gap:16px;border-top:1px solid var(--border)}
+    .compare-row:nth-child(even){background:var(--bg)}
+    .compare-row span{font-size:13px;color:var(--gray);text-align:center}
+    .compare-row span:first-child{text-align:left;font-weight:600;color:var(--dark)}
+    .check{color:var(--green);font-size:16px;font-weight:800}
+    .cross{color:#CBD5E1;font-size:16px}
+    .highlight{color:var(--blue);font-weight:700}
+
+    /* CTA */
+    .cta-section{background:linear-gradient(135deg,#0F172A,#1E3A8A);padding:80px 24px}
+    .cta-inner{max-width:700px;margin:0 auto;text-align:center}
+    .cta-section h2{font-size:42px;font-weight:800;color:white;margin-bottom:16px;line-height:1.2}
+    .cta-section p{font-size:18px;color:#94A3B8;margin-bottom:32px}
+    .cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+    .cta-btn-primary{padding:16px 32px;background:var(--blue);border-radius:12px;color:white;text-decoration:none;font-size:16px;font-weight:700;transition:all 0.2s}
+    .cta-btn-primary:hover{background:#1D4ED8;transform:translateY(-2px)}
+    .cta-btn-secondary{padding:16px 32px;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);border-radius:12px;color:white;text-decoration:none;font-size:16px;font-weight:700;transition:all 0.2s}
+    .cta-btn-secondary:hover{background:rgba(255,255,255,0.15)}
+    .cta-note{font-size:13px;color:#64748B;margin-top:20px}
+
+    /* FOOTER */
+    footer{background:#0F172A;padding:60px 24px 32px;color:#94A3B8}
+    .footer-inner{max-width:1200px;margin:0 auto}
+    .footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px}
+    .footer-brand{color:#94A3B8;font-size:14px;line-height:1.7;margin-top:12px}
+    .footer-col h4{font-size:13px;font-weight:700;color:white;margin-bottom:16px;text-transform:uppercase;letter-spacing:0.8px}
+    .footer-col a{display:block;color:#64748B;text-decoration:none;font-size:13px;margin-bottom:10px;transition:color 0.2s}
+    .footer-col a:hover{color:white}
+    .footer-bottom{border-top:1px solid #1E293B;padding-top:28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+    .footer-bottom p{font-size:12px;color:#475569}
+    .footer-links{display:flex;gap:24px}
+    .footer-links a{font-size:12px;color:#475569;text-decoration:none}
+    .footer-links a:hover{color:white}
+
+    /* MOBILE */
+    @media(max-width:768px){
+      .hero-inner{grid-template-columns:1fr}
+      .hero-visual{display:none}
+      .hero h1{font-size:36px}
+      .problem-grid,.features-grid,.pricing-grid,.testimonial-grid{grid-template-columns:1fr}
+      .steps{grid-template-columns:1fr}
+      .steps::before{display:none}
+      .footer-top{grid-template-columns:1fr 1fr}
+      .compare-hdr,.compare-row{grid-template-columns:2fr 1fr 1fr}
+      .compare-hdr span:nth-child(4),.compare-hdr span:nth-child(5),
+      .compare-row span:nth-child(4),.compare-row span:nth-child(5){display:none}
+      .nav-links{display:none}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="logo">
+      <div class="logo-icon">🏢</div>
+      <span class="logo-text">SocietyPro</span>
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How It Works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#compare">Compare</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <div class="nav-cta">
+      <a href="https://societyproapp.com/resident-login" class="btn-login">Resident Login</a>
+      <a href="https://societyproapp.com/login" class="btn-primary">Society Login →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge">🏆 #1 Society Management Platform in India</div>
+      <h1>Manage Your Society<br/><span>in Days — Not Months</span></h1>
+      <p>SocietyPro helps cooperative housing societies digitize maintenance billing, complaints, notices, and accounting — simply, quickly, and at just ₹25 per flat per month.</p>
+      <div class="hero-btns">
+        <a href="https://societyproapp.com/register" class="hero-btn-primary">🎁 Start Free Trial →</a>
+        <a href="https://societyproapp.com/login" class="hero-btn-secondary">🔐 Login to Dashboard</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><span class="hero-stat-val">500+</span><span class="hero-stat-label">Societies served</span></div>
+        <div class="hero-stat"><span class="hero-stat-val">25,000+</span><span class="hero-stat-label">Flats managed</span></div>
+        <div class="hero-stat"><span class="hero-stat-val">₹25</span><span class="hero-stat-label">Per flat/month</span></div>
+        <div class="hero-stat"><span class="hero-stat-val">30 days</span><span class="hero-stat-label">Free trial</span></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="mockup">
+        <div class="mockup-bar">
+          <div class="mockup-dot" style="background:#FF5F57"></div>
+          <div class="mockup-dot" style="background:#FEBC2E"></div>
+          <div class="mockup-dot" style="background:#28C840"></div>
+          <span class="mockup-title">societyproapp.com/dashboard</span>
+        </div>
+        <div class="mockup-body">
+          <div class="mockup-sidebar">
+            <div class="mockup-logo-m">🏢 SocietyPro</div>
+            <div class="mockup-nav-item active">📊 Dashboard</div>
+            <div class="mockup-nav-item">💰 Maintenance</div>
+            <div class="mockup-nav-item">🎫 Complaints</div>
+            <div class="mockup-nav-item">📢 Notices</div>
+            <div class="mockup-nav-item">📋 Accounting</div>
+            <div class="mockup-nav-item">🔐 Visitors</div>
+            <div class="mockup-nav-item">👥 Tenants</div>
+          </div>
+          <div class="mockup-content">
+            <div class="mockup-stat-row">
+              <div class="mockup-stat-card"><div class="mockup-stat-val">₹1.1L</div><div class="mockup-stat-label">Collected</div></div>
+              <div class="mockup-stat-card"><div class="mockup-stat-val" style="color:#D97706">₹15K</div><div class="mockup-stat-label">Pending</div></div>
+              <div class="mockup-stat-card"><div class="mockup-stat-val" style="color:#DC2626">3</div><div class="mockup-stat-label">Overdue</div></div>
+              <div class="mockup-stat-card"><div class="mockup-stat-val" style="color:#7C3AED">88%</div><div class="mockup-stat-label">Collection</div></div>
+            </div>
+            <div class="mockup-chart">
+              <div class="mockup-chart-title">Monthly Collection — Apr 2025</div>
+              <div class="mockup-bars">
+                <div class="mockup-bar-item" style="height:45%"></div>
+                <div class="mockup-bar-item" style="height:70%"></div>
+                <div class="mockup-bar-item" style="height:55%"></div>
+                <div class="mockup-bar-item" style="height:90%"></div>
+                <div class="mockup-bar-item" style="height:75%"></div>
+                <div class="mockup-bar-item" style="height:88%"></div>
+                <div class="mockup-bar-item" style="height:65%"></div>
+              </div>
+            </div>
+            <div class="mockup-table">
+              <div class="mockup-table-hdr">
+                <span>Flat</span><span>Resident</span><span>Amount</span><span>Status</span>
+              </div>
+              <div class="mockup-table-row"><span>A-101</span><span>Ramesh S.</span><span>₹2,500</span><span><span class="badge-green">Paid</span></span></div>
+              <div class="mockup-table-row"><span>B-202</span><span>Suresh P.</span><span>₹2,500</span><span><span class="badge-red">Overdue</span></span></div>
+              <div class="mockup-table-row"><span>C-301</span><span>Neha S.</span><span>₹2,500</span><span><span class="badge-orange">Pending</span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem" id="problem">
+  <div class="container">
+    <div class="text-center">
+      <div class="section-label">The Problem We Solve</div>
+      <h2 class="section-title">Still Using Excel, Registers & WhatsApp?</h2>
+      <p class="section-sub">Most housing societies waste 20+ hours every month on manual processes. SocietyPro fixes all of this.</p>
+    </div>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-emoji">😤</div>
+        <div class="problem-title">Calling 50 flats for maintenance every month</div>
+        <div class="problem-desc">Hours spent chasing each flat owner individually. Late payers cause cash flow problems. Collection rate stays at 60–70%.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-emoji">📋</div>
+        <div class="problem-title">Paper registers and WhatsApp for everything</div>
+        <div class="problem-desc">Complaints made verbally. Announcements buried in WhatsApp. Visitor log is a paper register no one can search.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-emoji">💰</div>
+        <div class="problem-title">Treasurer spends weekends on Excel sheets</div>
+        <div class="problem-desc">Balance sheet prepared manually. AGM preparation takes days. No way to quickly see who paid and who did not.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="container">
+    <div class="text-center">
+      <div class="section-label">Features</div>
+      <h2 class="section-title">Everything Your Society Needs</h2>
+      <p class="section-sub">One platform to replace Excel, WhatsApp, paper registers, and manual follow-up.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#EFF6FF">💰</div>
+        <div class="feature-title">Maintenance Billing</div>
+        <div class="feature-desc">Auto-generate bills for all flats. Track paid and pending. Send SMS reminders. Collection rate jumps to 85%+.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#F0FDF4">💳</div>
+        <div class="feature-title">Online Payments (UPI)</div>
+        <div class="feature-desc">Residents pay via UPI, GPay, PhonePe, cards. No cash handling. Instant payment confirmation.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#F5F3FF">🎫</div>
+        <div class="feature-title">Complaint Management</div>
+        <div class="feature-desc">Ticket system with categories, priority, status tracking, and resolution trail. No complaint goes unresolved.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#FFFBEB">📢</div>
+        <div class="feature-title">Announcements & Notices</div>
+        <div class="feature-desc">One-click notices to all residents. Emergency alerts. Meeting reminders. Acknowledgement tracking.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#EFF6FF">📊</div>
+        <div class="feature-title">Accounting Module</div>
+        <div class="feature-desc">Income, expenses, GST invoices, balance sheet, defaulter report. Export to Excel in one click.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#F0FDF4">🏠</div>
+        <div class="feature-title">Resident Portal</div>
+        <div class="feature-desc">Each flat owner gets their own login. View dues, pay online, raise complaints, read notices.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#FEF2F2">🔐</div>
+        <div class="feature-title">Visitor Management</div>
+        <div class="feature-desc">Gate entry log, flat owner alerts, searchable visitor history, vehicle registration.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#F5F3FF">📅</div>
+        <div class="feature-title">Meeting Management</div>
+        <div class="feature-desc">Schedule meetings, send invites, record minutes, track attendance — all in one place.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#FFFBEB">📱</div>
+        <div class="feature-title">SMS & WhatsApp Alerts</div>
+        <div class="feature-desc">Automated dues reminders, visitor alerts, payment confirmations via SMS and WhatsApp.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how-it-works">
+  <div class="container">
+    <div class="text-center">
+      <div class="section-label">How It Works</div>
+      <h2 class="section-title">Go Live in 3 Simple Steps</h2>
+      <p class="section-sub">No IT team. No servers. No complicated setup. Just register and start managing.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-title">Register Your Society</div>
+        <div class="step-desc">Enter society name, wings, total flats, and secretary email. 30-day free trial starts immediately. No credit card required.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-title">Set Up with Our Help</div>
+        <div class="step-desc">Our team calls within 24 hours. We help import your Excel data, configure flats, and set up resident access — free of charge.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-title">Go Live!</div>
+        <div class="step-desc">Post first announcement. Run first billing cycle. Residents get login credentials by SMS. UPI payments start on day one.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="container">
+    <div class="text-center">
+      <div class="section-label">Pricing</div>
+      <h2 class="section-title">Simple, Transparent Pricing</h2>
+      <p class="section-sub">No hidden charges. No setup fees. Pay only for what you need. All plans include a 30-day free trial.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-plan">STARTER</div>
+        <div class="pricing-price">₹25 <span>/ flat / month</span></div>
+        <div class="pricing-flats">Up to 50 flats &nbsp;·&nbsp; Example: 40 flats = ₹1,000/mo</div>
+        <ul class="pricing-features">
+          <li>Maintenance billing & dues</li>
+          <li>Complaints & notices</li>
+          <li>Committee & file repository</li>
+          <li>Accounting & GST invoices</li>
+          <li>Email support</li>
+          <li>Basic reports & exports</li>
+        </ul>
+        <a href="https://societyproapp.com/register" class="pricing-btn pricing-btn-outline">Start Free Trial</a>
+      </div>
+      <div class="pricing-card popular">
+        <div class="popular-badge">⭐ MOST POPULAR</div>
+        <div class="pricing-plan">STANDARD</div>
+        <div class="pricing-price">₹40 <span>/ flat / month</span></div>
+        <div class="pricing-flats">Up to 200 flats &nbsp;·&nbsp; Example: 80 flats = ₹3,200/mo</div>
+        <ul class="pricing-features">
+          <li>Everything in Starter</li>
+          <li>UPI & online payments</li>
+          <li>Visitor management</li>
+          <li>Resident portal login</li>
+          <li>SMS alerts (100 free/mo)</li>
+          <li>Phone & email support</li>
+          <li>Advanced reports</li>
+        </ul>
+        <a href="https://societyproapp.com/register" class="pricing-btn pricing-btn-filled">Start Free Trial</a>
+      </div>
+      <div class="pricing-card">
+        <div class="pricing-plan">PREMIUM</div>
+        <div class="pricing-price">₹60 <span>/ flat / month</span></div>
+        <div class="pricing-flats">Unlimited flats &nbsp;·&nbsp; Example: 200 flats = ₹12,000/mo</div>
+        <ul class="pricing-features">
+          <li>Everything in Standard</li>
+          <li>WhatsApp automation</li>
+          <li>White-label branding</li>
+          <li>Priority phone support</li>
+          <li>SMS alerts (500 free/mo)</li>
+          <li>API access</li>
+          <li>Dedicated account manager</li>
+        </ul>
+        <a href="https://societyproapp.com/register" class="pricing-btn pricing-btn-outline">Start Free Trial</a>
+      </div>
+    </div>
+    <p class="trial-note">🎁 All plans include 30-day free trial &nbsp;·&nbsp; No credit card required &nbsp;·&nbsp; Cancel anytime<br/>Yearly plan: Pay 10 months, get 2 months FREE (save 16%)</p>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials" id="testimonials">
+  <div class="container">
+    <div class="text-center">
+      <div class="section-label">Testimonials</div>
+      <h2 class="section-title">Trusted by Society Secretaries</h2>
+      <p class="section-sub">Real feedback from society secretaries and treasurers across India.</p>
+    </div>
+    <div class="testimonial-grid">
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"We went from calling 48 flats every month to just posting on SocietyPro. Collection rate improved from 65% to 91% in the first month itself."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">RS</div>
+          <div><div class="author-name">Rajesh Sharma</div><div class="author-role">Secretary, Sunrise Residency, Mumbai</div></div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"The accounting module saved my treasurer 2 full weekends. AGM preparation that used to take 3 days now takes 2 hours. Excellent software."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">PV</div>
+          <div><div class="author-name">Priya Verma</div><div class="author-role">Treasurer, Green Park CHS, Pune</div></div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"Residents love the portal — they can see their dues, pay online and raise complaints. We get 5x fewer phone calls to the secretary now."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">AM</div>
+          <div><div class="author-name">Amit Mehta</div><div class="author-role">Chairman, Silver Oak Apartments, Thane</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARE -->
+<section id="compare">
+  <div class="container">
+    <div class="text-center">
+      <div class="section-label">Comparison</div>
+      <h2 class="section-title">SocietyPro vs Competitors</h2>
+      <p class="section-sub">See how SocietyPro compares to other society management platforms.</p>
+    </div>
+    <div class="compare-table">
+      <div class="compare-hdr">
+        <span>Feature</span>
+        <span style="color:#60A5FA">SocietyPro</span>
+        <span>Mygate</span>
+        <span>NoBrokerHood</span>
+        <span>ApnaComplex</span>
+      </div>
+      <div class="compare-row"><span>Starting price</span><span class="highlight">₹25/flat</span><span>₹40+/flat</span><span>₹50+/flat</span><span>₹45+/flat</span></div>
+      <div class="compare-row"><span>Free trial</span><span class="check">✓ 30 days</span><span class="cross">✗</span><span class="cross">✗</span><span class="cross">✗</span></div>
+      <div class="compare-row"><span>Maintenance billing</span><span class="check">✓</span><span class="check">✓</span><span class="check">✓</span><span class="check">✓</span></div>
+      <div class="compare-row"><span>Online UPI payments</span><span class="check">✓</span><span class="check">✓</span><span class="check">✓</span><span class="check">✓</span></div>
+      <div class="compare-row"><span>Accounting & GST</span><span class="check">✓</span><span class="check">✓</span><span class="check">✓</span><span class="check">✓</span></div>
+      <div class="compare-row"><span>Resident portal login</span><span class="check">✓</span><span class="check">✓</span><span class="check">✓</span><span class="check">✓</span></div>
+      <div class="compare-row"><span>Visitor management</span><span class="check">✓</span><span class="check">✓</span><span class="check">✓</span><span class="check">✓</span></div>
+      <div class="compare-row"><span>Discussion forum</span><span class="check">✓</span><span class="cross">✗</span><span class="cross">✗</span><span class="check">✓</span></div>
+      <div class="compare-row"><span>Properties marketplace</span><span class="check">✓</span><span class="cross">✗</span><span class="check">✓</span><span class="cross">✗</span></div>
+      <div class="compare-row"><span>30-day free trial</span><span class="check">✓</span><span class="cross">✗</span><span class="cross">✗</span><span class="cross">✗</span></div>
+      <div class="compare-row"><span>Setup time</span><span class="highlight">1–3 days</span><span>1–2 weeks</span><span>1–2 weeks</span><span>2–4 weeks</span></div>
+      <div class="compare-row"><span>Local support (Maharashtra)</span><span class="check">✓</span><span class="cross">✗</span><span class="cross">✗</span><span class="cross">✗</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="contact">
+  <div class="cta-inner">
+    <h2>Ready to Digitize Your Society?</h2>
+    <p>Join hundreds of societies already using SocietyPro. Start your 30-day free trial today — no credit card, no commitment.</p>
+    <div class="cta-btns">
+      <a href="https://societyproapp.com/register" class="cta-btn-primary">🎁 Start Free Trial →</a>
+      <a href="https://societyproapp.com/login" class="cta-btn-secondary">🔐 Login to Dashboard</a>
+    </div>
+    <p class="cta-note">📞 +91 98200 12345 &nbsp;·&nbsp; 📧 info@societyproapp.com &nbsp;·&nbsp; 📍 India</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div style="width:36px;height:36px;background:#2563EB;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px">🏢</div>
+          <span style="font-size:18px;font-weight:800;color:white">SocietyPro</span>
+        </div>
+        <p class="footer-brand">Simple society management software built for cooperative housing societies in India and across India.</p>
+        <div style="margin-top:16px;display:flex;gap:12px">
+          <a href="#" style="color:#64748B;font-size:20px">📘</a>
+          <a href="#" style="color:#64748B;font-size:20px">💬</a>
+          <a href="#" style="color:#64748B;font-size:20px">📸</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#compare">Compare</a>
+        <a href="https://societyproapp.com/register">Register Society</a>
+      </div>
+      <div class="footer-col">
+        <h4>Login</h4>
+        <a href="https://societyproapp.com/login">Society Admin Login</a>
+        <a href="https://societyproapp.com/resident-login">Resident Login</a>
+        <a href="https://societyproapp.com/register">Register New Society</a>
+        <a href="https://societyproapp.com/pricing">View All Plans</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <a href="tel:+919820012345">📞 +91 98200 12345</a>
+        <a href="mailto:info@societyproapp.com">📧 info@societyproapp.com</a>
+        <a href="#">📍 India</a>
+        <a href="#">💬 WhatsApp Support</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 SocietyPro. All rights reserved. &nbsp;·&nbsp; societyproapp.com</p>
+      <div class="footer-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Refund Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Smooth scroll for nav links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // Nav background on scroll
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('nav');
+    nav.style.background = window.scrollY > 50
+      ? 'rgba(15,23,42,0.98)'
+      : 'rgba(15,23,42,0.95)';
+  });
+</script>
+</body>
+</html>
