@@ -1,6 +1,8 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://societypro-backend-production-e249.up.railway.app';
 import { Building2, User, Lock, MapPin, Home, ChevronRight, ChevronLeft, CheckCircle } from 'lucide-react';
 
 // ── Field component OUTSIDE main component — fixes typing bug ─────────────────
@@ -65,12 +67,73 @@ export default function Register() {
   const [admin, setAdmin] = useState({
     name: '', email: '', phone: '', password: '', confirm_password: '',
   });
+  const [error, setError] = useState('');
 
   const handleSubmit = async () => {
+    setError('');
+
+    // Validate
+    if (!society.name || !admin.email || !admin.password) {
+      setError('Society name, email and password are required.');
+      return;
+    }
+    if (admin.password !== admin.confirm_password) {
+      setError('Passwords do not match.');
+      return;
+    }
+    if (admin.password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1500));
-    setLoading(false);
-    setDone(true);
+    try {
+      const res = await fetch(`${API_URL}/api/saas/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name:              society.name,
+          address:           society.address,
+          city:              society.city,
+          state:             society.state,
+          pincode:           society.pincode,
+          reg_number:        society.reg_number,
+          established:       society.established,
+          total_flats:       setup.total_flats,
+          wings:             setup.wings,
+          maintenance_amount: setup.maintenance_amount,
+          secretary_name:    admin.name,
+          secretary_email:   admin.email,
+          secretary_phone:   admin.phone,
+          password:          admin.password,
+          plan_slug:         selectedPlan,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || 'Registration failed. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      // Save login token so they can go straight to dashboard
+      if (data.token) {
+        localStorage.setItem('token',    data.token);
+        localStorage.setItem('user',     JSON.stringify(data.user));
+        localStorage.setItem('userType', 'admin');
+        const maxAge = 30 * 24 * 60 * 60;
+        document.cookie = `token=${data.token}; path=/; max-age=${maxAge}; SameSite=Lax`;
+        document.cookie = `userType=admin; path=/; max-age=${maxAge}; SameSite=Lax`;
+      }
+
+      setDone(true);
+    } catch (err) {
+      setError('Cannot connect to server. Please check your connection.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (done) {
@@ -339,13 +402,21 @@ export default function Register() {
                 Next <ChevronRight size={16}/>
               </button>
             ) : (
-              <button onClick={handleSubmit} disabled={loading}
-                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 24px',
-                  background: loading ? '#94A3B8' : '#16A34A', border: 'none', borderRadius: 10,
-                  cursor: loading ? 'not-allowed' : 'pointer', fontSize: 13,
-                  fontWeight: 700, color: 'white', fontFamily: 'inherit' }}>
-                {loading ? '⏳ Registering...' : '🎉 Complete Registration'}
-              </button>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'flex-end' }}>
+                {error && (
+                  <div style={{ background: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.2)',
+                    borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#DC2626', width: '100%', boxSizing: 'border-box' }}>
+                    ❌ {error}
+                  </div>
+                )}
+                <button onClick={handleSubmit} disabled={loading}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 24px',
+                    background: loading ? '#94A3B8' : '#16A34A', border: 'none', borderRadius: 10,
+                    cursor: loading ? 'not-allowed' : 'pointer', fontSize: 13,
+                    fontWeight: 700, color: 'white', fontFamily: 'inherit' }}>
+                  {loading ? '⏳ Registering...' : '🎉 Complete Registration'}
+                </button>
+              </div>
             )}
           </div>
         </div>
