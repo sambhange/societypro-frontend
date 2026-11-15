@@ -2,7 +2,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://societypro-backend-production-e249.up.railway.app';
+const _raw = process.env.NEXT_PUBLIC_API_URL || '';
+const API_URL = (_raw.replace(/^["'\s]+|["'\s]+$/g, '') || '').startsWith('http')
+  ? _raw.replace(/^["'\s]+|["'\s]+$/g, '')
+  : 'https://societypro-backend-production-e249.up.railway.app';
 import { Building2, User, Lock, MapPin, Home, ChevronRight, ChevronLeft, CheckCircle } from 'lucide-react';
 
 // ── Field component OUTSIDE main component — fixes typing bug ─────────────────

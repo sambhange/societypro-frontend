@@ -2,7 +2,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://societypro-backend-production-e249.up.railway.app';
+const _raw = process.env.NEXT_PUBLIC_API_URL || '';
+const API_URL = (_raw.replace(/^["'\s]+|["'\s]+$/g, '') || '').startsWith('http')
+  ? _raw.replace(/^["'\s]+|["'\s]+$/g, '')
+  : 'https://societypro-backend-production-e249.up.railway.app';
 
 export default function SuperAdminLogin() {
   const [email, setEmail]       = useState('');

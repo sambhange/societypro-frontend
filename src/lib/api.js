@@ -1,4 +1,8 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://societypro-backend-production-e249.up.railway.app';
+// Strip accidental quotes/spaces from the env var (Vercel sometimes stores "https://..." with quotes)
+const _rawUrl = process.env.NEXT_PUBLIC_API_URL || '';
+const API_URL = (_rawUrl.replace(/^["'\s]+|["'\s]+$/g, '') || '').startsWith('http')
+  ? _rawUrl.replace(/^["'\s]+|["'\s]+$/g, '')
+  : 'https://societypro-backend-production-e249.up.railway.app';
 
 export function getToken() {
   if (typeof window === 'undefined') return null;
