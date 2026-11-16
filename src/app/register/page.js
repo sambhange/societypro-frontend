@@ -138,9 +138,9 @@ export default function Register() {
       setDone(true);
     } catch (err) {
       if (err.name === 'AbortError') {
-        setError('Server is taking too long. Please wait 30 seconds and try again — the server may be waking up.');
+        setError('Server is taking too long to respond. Please wait 30 seconds and try again.');
       } else {
-        setError('Cannot connect to server. Please check your connection.');
+        setError(`Connection error: ${err.message}. URL: ${API_URL}`);
       }
     } finally {
       setLoading(false);
