@@ -91,9 +91,12 @@ export default function Register() {
 
     setLoading(true);
     try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000); // 30 second timeout
       const res = await fetch(`${API_URL}/api/saas/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           name:              society.name,
           address:           society.address,
@@ -113,6 +116,7 @@ export default function Register() {
         }),
       });
 
+      clearTimeout(timeout);
       const data = await res.json();
 
       if (!res.ok) {
@@ -133,7 +137,11 @@ export default function Register() {
 
       setDone(true);
     } catch (err) {
-      setError('Cannot connect to server. Please check your connection.');
+      if (err.name === 'AbortError') {
+        setError('Server is taking too long. Please wait 30 seconds and try again — the server may be waking up.');
+      } else {
+        setError('Cannot connect to server. Please check your connection.');
+      }
     } finally {
       setLoading(false);
     }
