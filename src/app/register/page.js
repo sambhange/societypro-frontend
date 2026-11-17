@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 const _raw = process.env.NEXT_PUBLIC_API_URL || '';
@@ -58,6 +58,7 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [done, setDone]     = useState(false);
   const [selectedPlan, setSelectedPlan] = useState('standard');
+  const [serverWaking, setServerWaking] = useState(false);
 
   const [society, setSociety] = useState({
     name: '', address: '', city: '', state: '', pincode: '', reg_number: '', established: '',
@@ -71,6 +72,13 @@ export default function Register() {
     name: '', email: '', phone: '', password: '', confirm_password: '',
   });
   const [error, setError] = useState('');
+
+  // Pre-wake the server as soon as the page loads so it's ready by the time user submits
+  useEffect(() => {
+    fetch(`${API_URL}/health`, { method: 'GET' })
+      .then(() => console.log('Server awake'))
+      .catch(() => {}); // silent — just waking it up
+  }, []);
 
   const handleSubmit = async () => {
     setError('');
@@ -92,7 +100,7 @@ export default function Register() {
     setLoading(true);
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      const timeout = setTimeout(() => controller.abort(), 90000); // 90 second timeout (server may be waking up)
       const res = await fetch(`${API_URL}/api/saas/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -138,7 +146,7 @@ export default function Register() {
       setDone(true);
     } catch (err) {
       if (err.name === 'AbortError') {
-        setError('Server is taking too long to respond. Please wait 30 seconds and try again.');
+        setError('Server took too long. This happens when it has been idle. Please click "Complete Registration" again — it should work now.');
       } else {
         setError(`Connection error: ${err.message}. URL: ${API_URL}`);
       }
