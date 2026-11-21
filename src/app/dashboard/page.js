@@ -1,132 +1,186 @@
 'use client';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { announcements, maintenanceRecords, meetings, monthlyCollection, SOCIETY } from '../../lib/data';
 
-const CustomTooltip = ({ active, payload, label }) => {
-  if (!active || !payload?.length) return null;
-  return (
-    <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 14px', fontSize: 12 }}>
-      <p style={{ color: 'var(--muted)' }}>{label}</p>
-      <p style={{ color: 'var(--accent)', fontWeight: 700 }}>₹{payload[0]?.value?.toLocaleString()}</p>
-    </div>
-  );
-};
+const _raw = process.env.NEXT_PUBLIC_API_URL || '';
+const API_BASE = (_raw.replace(/^["'\s]+|["'\s]+$/g, '') || '').startsWith('http')
+  ? _raw.replace(/^["'\s]+|["'\s]+$/g, '')
+  : 'https://societypro-backend-production-e249.up.railway.app';
 
 export default function Dashboard() {
-  const paid    = maintenanceRecords.filter(r => r.status === 'Paid').length;
-  const pending = maintenanceRecords.filter(r => r.status === 'Pending').length;
-  const overdue = maintenanceRecords.filter(r => r.status === 'Overdue').length;
+  const [stats,    setStats]    = useState(null);
+  const [society,  setSociety]  = useState(null);
+  const [user,     setUser]     = useState(null);
+  const [loading,  setLoading]  = useState(true);
 
-  const stats = [
-    { label: 'Total Flats',         value: SOCIETY.totalFlats, badge: `${SOCIETY.wings.length} Wings`,    color: 'var(--accent)',  icon: '🏢' },
-    { label: 'Active Tenants',      value: 44,                 badge: '91.6% occupancy',                  color: 'var(--accent2)', icon: '👥' },
-    { label: 'Pending Dues',        value: '₹18,200',          badge: `${pending + overdue} flats`,        color: 'var(--red)',     icon: '💰' },
-    { label: 'Monthly Collection',  value: '₹92,500',          badge: '↑ 4% vs last month',               color: 'var(--gold)',    icon: '📈' },
+  useEffect(() => {
+    // Load user & society from localStorage
+    try {
+      const u = localStorage.getItem('user');
+      const s = localStorage.getItem('society');
+      if (u) setUser(JSON.parse(u));
+      if (s) setSociety(JSON.parse(s));
+    } catch(_) {}
+
+    // Fetch live stats from backend
+    const token = localStorage.getItem('token');
+    fetch(`${API_BASE}/api/dashboard`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+      .then(r => r.json())
+      .then(d => { if (d.success) setStats(d.stats); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const s = stats || {};
+
+  const statCards = [
+    { label: 'Total Flats',        value: s.total_flats    ?? society?.total_flats ?? '—', badge: society?.plan ? `${society.plan} plan` : 'trial plan',      color: '#4F46E5', icon: '🏢' },
+    { label: 'Active Residents',   value: s.total_tenants  ?? 0,                           badge: 'registered',                                                color: '#059669', icon: '👥' },
+    { label: 'Pending Dues',       value: s.pending_dues   ?? 0,                           badge: 'maintenance requests',                                      color: '#DC2626', icon: '🔧' },
+    { label: 'Open Complaints',    value: s.open_complaints ?? 0,                          badge: 'to resolve',                                                color: '#D97706', icon: '📋' },
   ];
 
-  const typeColor = t => t === 'urgent' ? 'var(--red)' : t === 'event' ? 'var(--gold)' : 'var(--accent2)';
-  const typeEmoji = t => t === 'urgent' ? '⚠️' : t === 'event' ? '📅' : 'ℹ️';
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh', flexDirection: 'column', gap: 16 }}>
+        <div style={{ fontSize: 40 }}>⏳</div>
+        <p style={{ color: 'var(--muted)', fontSize: 15 }}>Loading dashboard…</p>
+      </div>
+    );
+  }
 
   return (
     <div>
+      {/* Welcome banner */}
+      {society?.name && (
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(79,70,229,0.15) 0%, rgba(124,58,237,0.10) 100%)',
+          border: '1px solid rgba(79,70,229,0.2)',
+          borderRadius: 14, padding: '18px 24px', marginBottom: 24,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
+          <div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--white)' }}>
+              🏢 {society.name}
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
+              {[society.city, society.state].filter(Boolean).join(', ')}
+              {society.total_flats ? ` · ${society.total_flats} flats` : ''}
+              {society.plan ? ` · ${society.plan} plan` : ''}
+            </div>
+          </div>
+          <div style={{
+            background: 'rgba(79,70,229,0.2)', borderRadius: 10,
+            padding: '6px 14px', fontSize: 12, fontWeight: 700, color: '#818CF8',
+          }}>
+            {user?.role === 'secretary' ? '🔑 Secretary' : user?.role || 'Admin'}
+          </div>
+        </div>
+      )}
+
       {/* Stat Cards */}
       <div className="stats-grid">
-        {stats.map((s, i) => (
+        {statCards.map((c, i) => (
           <div className="stat-card" key={i}>
-            <div className="stat-icon">{s.icon}</div>
-            <div className="stat-value" style={{ color: s.color }}>{s.value}</div>
-            <div className="stat-label">{s.label}</div>
-            <div className="stat-badge" style={{ background: `${s.color}20`, color: s.color }}>{s.badge}</div>
+            <div className="stat-icon">{c.icon}</div>
+            <div className="stat-value" style={{ color: c.color }}>{c.value}</div>
+            <div className="stat-label">{c.label}</div>
+            <div className="stat-badge" style={{ background: `${c.color}20`, color: c.color }}>{c.badge}</div>
           </div>
         ))}
       </div>
 
-      {/* Chart + Announcements */}
+      {/* Quick actions + getting-started */}
       <div className="grid-2">
-        {/* Monthly collection chart */}
         <div className="card">
-          <div className="card-title">
-            <span>📊 Monthly Collection</span>
-            <span className="tag">Last 6 months</span>
-          </div>
-          <ResponsiveContainer width="100%" height={180}>
-            <BarChart data={monthlyCollection} barSize={28}>
-              <XAxis dataKey="month" tick={{ fill: 'var(--muted)', fontSize: 12 }} axisLine={false} tickLine={false} />
-              <YAxis hide />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.04)' }} />
-              <Bar dataKey="collected" radius={[6, 6, 0, 0]}>
-                {monthlyCollection.map((_, i) => (
-                  <Cell key={i} fill={i === monthlyCollection.length - 1 ? 'var(--accent)' : 'var(--border)'} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="card-title"><span>⚡ Quick Actions</span></div>
+          {[
+            { href: '/tenants',       icon: '👤', label: 'Add Resident',       desc: 'Register a new flat owner or tenant' },
+            { href: '/maintenance',   icon: '💰', label: 'Record Payment',      desc: 'Log maintenance or dues payment' },
+            { href: '/announcements', icon: '📢', label: 'Post Announcement',   desc: 'Send a notice to all residents' },
+            { href: '/complaints',    icon: '📋', label: 'View Complaints',     desc: 'See open resident complaints' },
+          ].map(a => (
+            <Link key={a.href} href={a.href} style={{ textDecoration: 'none' }}>
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 14,
+                padding: '12px 0', borderBottom: '1px solid rgba(30,45,69,0.4)',
+                cursor: 'pointer',
+              }}>
+                <div style={{
+                  width: 40, height: 40, borderRadius: 10,
+                  background: 'rgba(79,70,229,0.12)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
+                  flexShrink: 0,
+                }}>{a.icon}</div>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: 13.5, color: 'var(--white)' }}>{a.label}</div>
+                  <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{a.desc}</div>
+                </div>
+                <span style={{ marginLeft: 'auto', color: 'var(--muted)', fontSize: 16 }}>›</span>
+              </div>
+            </Link>
+          ))}
         </div>
 
-        {/* Live announcements */}
         <div className="card">
-          <div className="card-title">
-            <span>📢 Live Announcements</span>
-            <Link href="/announcements"><span style={{ fontSize: 12, color: 'var(--accent)', cursor: 'pointer' }}>View all →</span></Link>
-          </div>
-          {announcements.slice(0, 3).map(a => (
-            <div key={a.id} className={`announce-banner announce-${a.type === 'urgent' ? 'urgent' : a.type === 'event' ? 'event' : 'info'}`}>
-              <span style={{ fontSize: 18 }}>{typeEmoji(a.type)}</span>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: 13.5, color: 'var(--white)' }}>{a.title}</div>
-                <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{a.body.slice(0, 65)}...</div>
-                <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 5 }}>{a.date} · {a.by}</div>
+          <div className="card-title"><span>🚀 Getting Started</span></div>
+          {[
+            { done: true,  step: 'Society registered',      desc: 'Your account is set up and active' },
+            { done: (s.total_tenants > 0), step: 'Add your first resident', desc: 'Go to Tenants → Add Resident', href: '/tenants' },
+            { done: false, step: 'Set up maintenance dues',  desc: 'Go to Maintenance → Billing', href: '/maintenance' },
+            { done: false, step: 'Post an announcement',     desc: 'Go to Announcements → New Post', href: '/announcements' },
+          ].map((item, i) => (
+            <div key={i} style={{
+              display: 'flex', alignItems: 'center', gap: 14,
+              padding: '12px 0', borderBottom: '1px solid rgba(30,45,69,0.4)',
+            }}>
+              <div style={{
+                width: 28, height: 28, borderRadius: '50%',
+                background: item.done ? 'rgba(5,150,105,0.15)' : 'rgba(79,70,229,0.1)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 14, flexShrink: 0,
+              }}>
+                {item.done ? '✅' : '○'}
               </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 700, fontSize: 13.5, color: item.done ? 'var(--muted)' : 'var(--white)' }}>
+                  {item.step}
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{item.desc}</div>
+              </div>
+              {item.href && !item.done && (
+                <Link href={item.href}>
+                  <span style={{ fontSize: 12, color: '#818CF8', fontWeight: 600 }}>Go →</span>
+                </Link>
+              )}
             </div>
           ))}
         </div>
       </div>
 
-      {/* Maintenance + Meetings */}
-      <div className="grid-2">
-        {/* Maintenance summary */}
-        <div className="card">
-          <div className="card-title">
-            <span>🔧 Maintenance – April 2025</span>
-            <Link href="/maintenance"><span style={{ fontSize: 12, color: 'var(--accent)', cursor: 'pointer' }}>View all →</span></Link>
-          </div>
-          {[
-            { label: 'Paid',    count: paid,    color: 'var(--accent)', emoji: '✅' },
-            { label: 'Pending', count: pending, color: 'var(--gold)',   emoji: '⏳' },
-            { label: 'Overdue', count: overdue, color: 'var(--red)',    emoji: '🔴' },
-          ].map(s => (
-            <div key={s.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid rgba(30,45,69,0.4)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span>{s.emoji}</span>
-                <span style={{ fontSize: 14, fontWeight: 600 }}>{s.label} Flats</span>
-              </div>
-              <div style={{ fontSize: 20, fontWeight: 800, color: s.color }}>{s.count}</div>
-            </div>
-          ))}
-          <div style={{ marginTop: 14, textAlign: 'right' }}>
-            <span style={{ fontSize: 13, color: 'var(--muted)' }}>Total collected this month: </span>
-            <span style={{ fontWeight: 800, color: 'var(--accent)', fontSize: 15 }}>₹{paid * 2500}/-</span>
-          </div>
+      {/* Collection summary */}
+      <div className="card" style={{ marginTop: 0 }}>
+        <div className="card-title">
+          <span>💰 Collection Summary</span>
+          <Link href="/maintenance"><span style={{ fontSize: 12, color: 'var(--accent)', cursor: 'pointer' }}>View all →</span></Link>
         </div>
-
-        {/* Upcoming meetings */}
-        <div className="card">
-          <div className="card-title">
-            <span>📅 Upcoming Meetings</span>
-            <Link href="/meetings"><span style={{ fontSize: 12, color: 'var(--accent)', cursor: 'pointer' }}>View all →</span></Link>
-          </div>
-          {meetings.filter(m => m.status === 'Upcoming').map(m => (
-            <div key={m.id} style={{ display: 'flex', gap: 14, padding: '12px 0', borderBottom: '1px solid rgba(30,45,69,0.4)' }}>
-              <div style={{ minWidth: 48, height: 48, background: 'rgba(0,198,167,0.12)', borderRadius: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontSize: 13, color: 'var(--accent)', fontWeight: 800 }}>{m.date.split(' ')[0]}</span>
-                <span style={{ fontSize: 10, color: 'var(--muted)' }}>{m.date.split(' ')[1]}</span>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16, marginTop: 8 }}>
+          {[
+            { label: 'Total Collected',  value: `₹${(s.total_collected || 0).toLocaleString()}`, color: '#059669' },
+            { label: 'Collection Rate',  value: `${s.collection_rate  || 0}%`,                   color: '#4F46E5' },
+            { label: 'Pending Dues',     value: s.pending_dues   ?? 0,                            color: '#D97706', suffix: ' requests' },
+            { label: 'Open Complaints',  value: s.open_complaints ?? 0,                           color: '#DC2626', suffix: ' open' },
+          ].map((item, i) => (
+            <div key={i} style={{
+              background: 'rgba(255,255,255,0.03)', borderRadius: 10,
+              padding: '14px 18px', border: '1px solid rgba(255,255,255,0.06)',
+            }}>
+              <div style={{ fontSize: 22, fontWeight: 800, color: item.color }}>
+                {item.value}{item.suffix || ''}
               </div>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: 13.5, color: 'var(--white)' }}>{m.title}</div>
-                <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 2 }}>{m.time} · {m.venue}</div>
-                <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4 }}>{m.agenda.slice(0, 55)}...</div>
-              </div>
+              <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4 }}>{item.label}</div>
             </div>
           ))}
         </div>

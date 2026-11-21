@@ -34,6 +34,7 @@ export default function LoginPage() {
       localStorage.setItem('token',    data.token);
       localStorage.setItem('user',     JSON.stringify(data.user));
       localStorage.setItem('userType', data.userType || 'admin');
+      if (data.society) localStorage.setItem('society', JSON.stringify(data.society));
 
       const maxAge = 7 * 24 * 60 * 60;
       document.cookie = `token=${data.token}; path=/; max-age=${maxAge}; SameSite=Lax`;

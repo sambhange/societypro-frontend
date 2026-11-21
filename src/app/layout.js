@@ -2,7 +2,7 @@
 import '../styles/globals.css';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   LayoutDashboard, Users, Wrench, Megaphone,
   CalendarCheck, Image, CreditCard, Ticket,
@@ -71,6 +71,17 @@ const NO_LAYOUT_PAGES = [
 export default function RootLayout({ children }) {
   const pathname = usePathname();
   const router   = useRouter();
+  const [currentUser,    setCurrentUser]    = useState(null);
+  const [currentSociety, setCurrentSociety] = useState(null);
+
+  useEffect(() => {
+    try {
+      const u = localStorage.getItem('user');
+      const s = localStorage.getItem('society');
+      if (u) setCurrentUser(JSON.parse(u));
+      if (s) setCurrentSociety(JSON.parse(s));
+    } catch(_) {}
+  }, [pathname]);
 
   // Check if current page should have NO sidebar
   const noLayout = NO_LAYOUT_PAGES.some(p =>
@@ -114,8 +125,8 @@ export default function RootLayout({ children }) {
           <aside className="sidebar">
             {/* Logo */}
             <div className="logo">
-              <div className="logo-name">🏢 SocietyPro</div>
-              <div className="logo-sub">Society Management</div>
+              <div className="logo-name">🏢 {currentSociety?.name || 'SocietyPro'}</div>
+              <div className="logo-sub">{currentSociety?.city ? `${currentSociety.city} · ` : ''}Society Management</div>
             </div>
 
             {/* Navigation */}
@@ -161,8 +172,8 @@ export default function RootLayout({ children }) {
             <div className="sidebar-footer">
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                 <div style={{ flex:1, minWidth:0 }}>
-                  <div className="sidebar-user">Admin</div>
-                  <div className="sidebar-role">Society Secretary</div>
+                  <div className="sidebar-user">{currentUser?.name || 'Admin'}</div>
+                  <div className="sidebar-role">{currentUser?.role === 'secretary' ? 'Society Secretary' : currentUser?.role || 'Admin'}</div>
                 </div>
                 <button onClick={handleLogout} title="Logout"
                   style={{ background:'rgba(220,38,38,0.08)', border:'1px solid rgba(220,38,38,0.15)',

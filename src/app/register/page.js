@@ -138,6 +138,7 @@ export default function Register() {
         localStorage.setItem('token',    data.token);
         localStorage.setItem('user',     JSON.stringify(data.user));
         localStorage.setItem('userType', 'admin');
+        if (data.society) localStorage.setItem('society', JSON.stringify(data.society));
         const maxAge = 30 * 24 * 60 * 60;
         document.cookie = `token=${data.token}; path=/; max-age=${maxAge}; SameSite=Lax`;
         document.cookie = `userType=admin; path=/; max-age=${maxAge}; SameSite=Lax`;
